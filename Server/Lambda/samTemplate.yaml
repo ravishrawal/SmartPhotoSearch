@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: SAM template for all lambdas in SmartPhotoSearch 
+Globals:
+  Function:
+    Environment:
+        Variables:
+          REGION: us-east-1
+Resources:
+  indexphotos:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: './Server/Lambda/index-photos (LF1)'
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: 'arn:aws:iam::492808346955:role/service-role/index-photos-role-ork70yys'
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket1
+            Events:
+              - 's3:ObjectCreated:Put'
+      Layers:
+        - >-
+          arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:14
+        - >-
+          arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:11
+        - 'arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1'
+  Bucket1:
+    Type: 'AWS::S3::Bucket'
+  
+  searchphotos:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: './Server/Lambda/search-photos (LF2)'
+      Description: ''
+      MemorySize: 128
+      Timeout: 7
+      Role: 'arn:aws:iam::492808346955:role/service-role/search-photos-role-pt64js09'
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: GET
+      Layers:
+        - 'arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1'
+        - >-
+          arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:15
+        - >-
+          arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:12
