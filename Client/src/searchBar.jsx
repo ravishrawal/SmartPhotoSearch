@@ -9,9 +9,11 @@ class SearchBar extends Component{
 			searchterm: '',
 			dirty: false,
 			images: [],
+			speech: false
 		}
 		this.inputHandler = this.inputHandler.bind(this);
 		this.searchHandler = this.searchHandler.bind(this);
+		this.speechHandler = this.speechHandler.bind(this);
 	}
 	componentDidMount(){
 		console.log('search bar mounted');
@@ -22,7 +24,7 @@ class SearchBar extends Component{
 	}
 	searchHandler(e){
 		e.preventDefault();
-		var q = this.state.searchterm
+  		var q = this.state.searchterm
 		var headers = { "Access-Control-Allow-Origin": '*' }
 		axios.get('https://gjn0sehjb2.execute-api.us-east-1.amazonaws.com/Dev/search',
 					{
@@ -30,36 +32,48 @@ class SearchBar extends Component{
 					      q
 					  	}
 				  	})
-			 .then(res => res.data)
-			 .then(img_arr => {
-			 	this.setState({images: img_arr})
-			 })
+					 .then(res => res.data)
+					 .then(img_arr => {
+					 	this.setState({images: img_arr})
+					 })	
+	}
+	speechHandler(words){
+		this.setState({speech:words, searchterm:words, dirty:true})
 	}
 	render(){
-		console.log(this.state)
 		var img_static = "data:image/png;base64, "
+		var {dirty, speech, searchterm} = this.state
 		return (
-			<div className="row" style={{ margin:"auto", marginTop:"30px" }}>
-		        <div className="col-sm-8">
+			<div className="container" >
+				<h3 className="lead">Search Your Library</h3>
+		        <div>
 		        	<div className="input-group mb-3">
 					  <div className="input-group-prepend">
-					    <span className="input-group-text border border-warning" id="basic-addon1">
+					    <span className="input-group-text rounded" id="basic-addon1">
 					    	<i className="fas fa-search"></i>
-					    	<SpeechRecognition />
+					    	<input type="text" 
+					    		onChange={this.inputHandler} 
+					    		className="form-control border border-warning" 
+					    		placeholder={speech ? searchterm : "search"} 
+					    		aria-label="Search" 
+					    		aria-describedby="basic-addon1" 
+					    		style={{margin:"auto 10px"}}
+					    	/>
+					    	<SpeechRecognition onSpeech={this.speechHandler}/>
+					    	{ searchterm && 
+					        	<div>
+					        		<button className="btn btn-dark" onClick={this.searchHandler}>
+					        			Go
+				        			</button>
+				        		</div>
+			        		}
 					    </span>
-					  </div>
-					  <input type="text" onChange={this.inputHandler} className="form-control border border-warning" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" />
+				  	  </div>
 					</div>
 		        </div>
-		        { this.state.dirty && 
-		        	<div className="col-sm">
-		        		<button className="btn btn-warning" onClick={this.searchHandler}>
-		        			Go
-	        			</button>
-	        		</div>
-        		}
         		{ this.state.images.length > 0 &&
         			<div className="container">
+        				<hr />
         				<div className="row" > 
 	        				{ this.state.images.map((item, index) => {
 	        					var img_url = item.image

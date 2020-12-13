@@ -70,16 +70,20 @@ class UploadPhoto extends Component {
 	render() {
 		return (
 					<div className="container">
+						<h3 className="lead">Upload A Photo</h3>
 			        	{ this.state.submitted == false &&
 			        		<div>
 				        		<form action="/action_page.php" onSubmit={this.submitHandler}>
-						        	<div className="row" style={{margin:"auto"}}>
-										<div className="col-sm-4">
-										  	Upload Photo
-										  	<input type="file" id="img" name="img" accept="image/*" onChange={this.uploadPicture} />
+						        	<div className="bg-light">
+										<div>
+										  	<input 
+										  		style={{padding:"1px"}} 
+										  		type="file" id="img" 
+										  		name="img" accept="image/*" 
+										  		onChange={this.uploadPicture} />
 										</div>
-										<div className="col-sm-4" style={{marginTop:"10px"}}>
-									  		<input className="btn btn-success" type="submit" />
+										<div>
+									  		<input className="btn btn-dark" type="submit" style={{width:"103px", height:"30px", display:"block", padding:"1px"}} />
 								  		</div>
 							  	    </div>
 								</form>
@@ -88,7 +92,7 @@ class UploadPhoto extends Component {
 						{ this.state.submitted &&
 							<div>
 								Submitted!
-								<button className="btn btn-primary" onClick={this.resetHandler}>Submit Another</button>
+								<button className="btn btn-primary col" onClick={this.resetHandler}>Submit Another</button>
 							</div>
 						}
 					</div>
