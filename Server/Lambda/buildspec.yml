@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     commands:
-      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket lambdas-smartphotosearch --output-template-file outputsamtemplate.yml
+      - aws cloudformation package --template-file Server/Lambda/samTemplate.yaml --s3-bucket lambdas-smartphotosearch --output-template-file Server/Lambda/outputsamtemplate.yml
 artifacts:
   # type: zip
   files:
