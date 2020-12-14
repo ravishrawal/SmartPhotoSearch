@@ -2,7 +2,7 @@ import json
 from rekognitionMethods import *
 from helpers import *
 from ESmethods import *
-# LOOK AT ME
+# LOOK AT ME!
 def lambda_handler(event, context):
     
     #extract photo information
