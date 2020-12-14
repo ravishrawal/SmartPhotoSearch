@@ -26,7 +26,7 @@ class SearchBar extends Component{
 		e.preventDefault();
   		var q = this.state.searchterm
 		var headers = { "Access-Control-Allow-Origin": '*' }
-		axios.get('https://r8jr30hj6i.execute-api.us-east-1.amazonaws.com/Prod',
+		axios.get('https://r8jr30hj6i.execute-api.us-east-1.amazonaws.com/Prod/search',
 					{
 					  	params: {
 					      q
