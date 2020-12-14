@@ -69,4 +69,3 @@ def searchES(label):
         matchingPhotosArray.append((photo_name, bucket_name))
     
     return matchingPhotosArray
-

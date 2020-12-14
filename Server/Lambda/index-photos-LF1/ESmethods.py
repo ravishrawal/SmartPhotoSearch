@@ -40,4 +40,3 @@ def addToES(json_obj):
     
     print('ES upload:', res)
     return len(res)
-
