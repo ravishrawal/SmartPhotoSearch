@@ -23,8 +23,6 @@ phases:
 artifacts:
   # type: zip
   files:
-    - samTemplate.yaml
-    - outputsamtemplate.yml
     - '**/*'
   base-directory: Client/build
 
