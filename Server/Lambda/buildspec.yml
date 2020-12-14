@@ -23,4 +23,4 @@ artifacts:
   files:
     - samTemplate.yaml
     - outputsamtemplate.json
-  base-directory: build
+
