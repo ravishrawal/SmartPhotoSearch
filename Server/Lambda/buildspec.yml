@@ -3,8 +3,25 @@ phases:
   install:
     commands:
       - aws cloudformation package --template-file Server/Lambda/samTemplate.yaml --s3-bucket lambdas-smartphotosearch --output-template-file outputsamtemplate.json --use-json
+
+  pre_build:
+    commands:
+      - echo Installing npm
+      - npm install
+  build:
+    commands:
+      - echo building
+      - npm run build
+  
+  post_build:
+    commands:
+      - aws s3 cp --recursive --acl public-read ./build s3://photo-album-hosting/
+  
+
 artifacts:
   type: zip
   files:
     - samTemplate.yaml
     - outputsamtemplate.json
+  base-directory: build
+  
