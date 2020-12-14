@@ -17,7 +17,7 @@ phases:
   post_build:
     commands:
       - ls -a
-      - aws s3 cp --recursive --acl public-read ./build s3://photo-album-hosting/
+      - aws s3 cp --recursive --acl public-read ./Client/build s3://photo-album-hosting/
   
 
 artifacts:
