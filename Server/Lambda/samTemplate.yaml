@@ -24,7 +24,7 @@ Resources:
             Bucket:
               Ref: Bucket1
             Events:
-              - 's3:ObjectCreated:Put'
+              - 's3:ObjectCreated:*'
       Layers:
         - >-
           arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:14
@@ -33,6 +33,8 @@ Resources:
         - 'arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1'
   Bucket1:
     Type: 'AWS::S3::Bucket'
+
+
   
   searchphotos:
     Type: 'AWS::Serverless::Function'
