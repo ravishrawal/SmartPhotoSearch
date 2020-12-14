@@ -24,7 +24,8 @@ Resources:
             Bucket:
               Ref: Bucket1
             Events:
-              - 's3:ObjectCreated:*'
+              - 's3:ObjectCreated:Put'
+
       Layers:
         - >-
           arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:14
