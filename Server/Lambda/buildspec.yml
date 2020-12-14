@@ -7,11 +7,11 @@ phases:
   pre_build:
     commands:
       - echo Installing npm
-      - npm install
+      - npm --prefix ./Client/ install 
   build:
     commands:
       - echo building
-      - npm run build
+      - npm --prefix ./Client/ run build
   
   post_build:
     commands:
@@ -19,9 +19,8 @@ phases:
   
 
 artifacts:
-  type: zip
+  # type: zip
   files:
     - samTemplate.yaml
     - outputsamtemplate.json
   base-directory: build
-  
