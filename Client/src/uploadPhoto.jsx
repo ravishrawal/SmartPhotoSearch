@@ -25,8 +25,6 @@ class UploadPhoto extends Component {
 	}
 	componentDidMount() {
 		console.log('upload mounted!');
-		// apigClient.invokeApi({}, '/search', 'GET',{},{})
-		// .then(res => console.log(res))
 	}
 	uploadPicture(e){
 		e.preventDefault()
@@ -52,7 +50,7 @@ class UploadPhoto extends Component {
 		const s3 = new AWS.S3({apiVersion: '2006-03-01'})
 		var params = {
 		  Body: this.state.pictureAsFile, 
-		  Bucket: "rav-viren-photos", 
+		  Bucket: "smartphotoalbumstack-bucket1-djpcrw1v9ur2", 
 		  Key: uuidv4()
 		};
 		s3.putObject(params, (err, data)=> {
