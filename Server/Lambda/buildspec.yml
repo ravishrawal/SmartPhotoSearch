@@ -11,10 +11,12 @@ phases:
   build:
     commands:
       - echo building
-      - npm --prefix ./Client/ run build
+      - npm --prefix ./Client/ run build 
+      - ls -a
   
   post_build:
     commands:
+      - ls -a
       - aws s3 cp --recursive --acl public-read ./build s3://photo-album-hosting/
   
 
