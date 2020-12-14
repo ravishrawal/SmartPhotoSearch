@@ -24,7 +24,7 @@ Resources:
             Bucket:
               Ref: Bucket1
             Events:
-              - 's3:ObjectCreated:Put'
+              - 's3:ObjectCreated:*'
 
       Layers:
         - >-
