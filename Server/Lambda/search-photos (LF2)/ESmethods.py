@@ -8,6 +8,7 @@ sys.path.insert(1, '/opt')
 from requests_aws4auth import AWS4Auth
 
 
+
 class MyES():
     def __init__(self):
         self.host = "search-search-photos-g7nnykm7uwwvtnkbzv5coxsxua.us-east-1.es.amazonaws.com"
