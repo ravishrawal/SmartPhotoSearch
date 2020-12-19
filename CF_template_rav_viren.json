@@ -1,570 +1,627 @@
 {
-  "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CD Demo Lambda",
-  "Resources": {
-    "indexphotos": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "codepipeline-us-east-1-509756505110",
-           "S3Key": "P1/SourceArti/24djsDD/Server/Lambda/index-photos (LF1)"
-        },
-        "Description": "Lambda function to index photos",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Environment": {
-          "Variables": {
-            "REGION": "us-east-1"
-          }
-        },
-        "Handler": "lambda_function.lambda_handler",
-        "Role": "arn:aws:iam::492808346955:role/service-role/index-photos-role-ork70yys",
-        "Timeout": 30,
-        "Runtime": "python3.8",
-        "Layers":
-        [
-          {"arn": "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:14"},
-          {"arn": "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:11"},
-          {"arn":"arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1"}
-        ],
-        "FunctionName": "index-photos-cf",
-      }
-    },
-    
-    "searchphotos": {
-      "Type": "AWS::Lambda::Function",
-      "Properties": {
-        "Code": {
-          "S3Bucket": "codepipeline-us-east-1-509756505110",
-           "S3Key": "P1/SourceArti/24djsDD/Server/Lambda/search-photos (LF2)"
-        },
-        "Description": "Lambda function to index photos",
-        "Tags": [
-          {
-            "Value": "SAM",
-            "Key": "lambda:createdBy"
-          }
-        ],
-        "MemorySize": 128,
-        "Environment": {
-          "Variables": {
-            "REGION": "us-east-1"
-          }
-        },
-        "Handler": "lambda_function.lambda_handler",
-        "Role": "arn:aws:iam::492808346955:role/service-role/search-photos-role-pt64js09",
-        "Timeout": 30,
-        "Runtime": "python3.8",
-
-        "Layers":
-        [
-          {"arn": "arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1"},
-          {"arn": "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:15"},
-          {"arn":"arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:12"}
-        ],
-        "FunctionName": "search-photos-cf",
-      }
-    },
-
-    "ServerlessRestApiDeployment20b4e0eea9": {
-      "Type": "AWS::ApiGateway::Deployment",
-      "Properties": {
-        "RestApiId": {
-          "Ref": "ServerlessRestApi"
-        },
-        "Description": "RestApi deployment id: r8jr30hj6i",
-        "StageName": "Stage"
-      }
-    },
-    "ServerlessRestApi": {
-      "Type": "AWS::ApiGateway::RestApi",
-      "Properties": {
-        "Body": {
-            "openapi": "3.0.1",
-            "info": {
-              "title": "AI Photo Search",
-              "description": "AI Photo Search Application",
-              "version": "1.0.0"
-            },
-            "servers": [
-              {
-                "url": "https://r8jr30hj6i.execute-api.us-east-1.amazonaws.com/{basePath}",
-                "variables": {
-                  "basePath": {
-                    "default": "/Prod"
-                  }
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "SAM template for all lambdas in SmartPhotoSearch",
+    "Resources": {
+        "Bucket1": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "NotificationConfiguration": {
+                    "LambdaConfigurations": [
+                        {
+                            "Function": {
+                                "Fn::GetAtt": [
+                                    "indexphotos",
+                                    "Arn"
+                                ]
+                            },
+                            "Event": "s3:ObjectCreated:*"
+                        }
+                    ]
                 }
-              }
+            },
+            "DependsOn": [
+                "indexphotosBucketEvent1Permission"
             ],
-            "paths": {
-              "/upload": {
-                "put": {
-                  "operationId": "uploadPhoto",
-                  "x-amazon-apigateway-integration":{
-                    "httpMethod":"POST",
-                    "type": "aws_proxy",
-                    "uri": {
-                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${indexphotos.Arn}/invocations"
-                    }
-                  },
-                  "responses": {
-                    "200": {
-                      "description": "200 response",
-                      "headers": {
-                        "Access-Control-Allow-Origin": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/MODELcff9be"
-                          }
-                        }
-                      }
-                    },
-                    "400": {
-                      "description": "400 response",
-                      "content": {}
-                    },
-                    "403": {
-                      "description": "403 response",
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/Error"
-                          }
-                        }
-                      }
-                    },
-                    "500": {
-                      "description": "500 response",
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/Error"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "options": {
-                  "responses": {
-                    "200": {
-                      "description": "200 response",
-                      "headers": {
-                        "Access-Control-Allow-Origin": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        },
-                        "Access-Control-Allow-Methods": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        },
-                        "Access-Control-Allow-Headers": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "content": {}
-                    },
-                    "400": {
-                      "description": "400 response",
-                      "content": {}
-                    },
-                    "403": {
-                      "description": "403 response",
-                      "content": {}
-                    },
-                    "404": {
-                      "description": "404 response",
-                      "content": {}
-                    },
-                    "500": {
-                      "description": "500 response",
-                      "content": {}
-                    }
-                  }
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "efe27200-2ca1-47ca-a53a-f0f45d3738db"
                 }
-              },
-              "/search": {
-                "get": {
-                  "operationId": "searchPhotos",
-                  "x-amazon-apigateway-integration":{
-                    "httpMethod":"POST",
-                    "type": "aws_proxy",
-                    "uri": {
-                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${searchphotos.Arn}/invocations"
-                    }
-                  },
-                  "parameters": [
-                    {
-                      "name": "q",
-                      "in": "query",
-                      "schema": {
-                        "type": "string"
-                      }
-                    }
-                  ],
-                  "responses": {
-                    "200": {
-                      "description": "200 response",
-                      "headers": {
-                        "Access-Control-Allow-Origin": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/SearchResponse"
-                          }
-                        }
-                      }
-                    },
-                    "403": {
-                      "description": "403 response",
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/Error"
-                          }
-                        }
-                      }
-                    },
-                    "500": {
-                      "description": "500 response",
-                      "content": {
-                        "application/json": {
-                          "schema": {
-                            "$ref": "#/components/schemas/Error"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "options": {
-                  "responses": {
-                    "200": {
-                      "description": "200 response",
-                      "headers": {
-                        "Access-Control-Allow-Origin": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        },
-                        "Access-Control-Allow-Methods": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        },
-                        "Access-Control-Allow-Headers": {
-                          "schema": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "content": {}
-                    },
-                    "400": {
-                      "description": "400 response",
-                      "content": {}
-                    },
-                    "403": {
-                      "description": "403 response",
-                      "content": {}
-                    },
-                    "500": {
-                      "description": "500 response",
-                      "content": {}
-                    }
-                  }
-                }
-              }
-            },
-            "components": {
-              "schemas": {
-                "Error": {
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "MODELcff9be": {
-                  "type": "object",
-                  "properties": {}
-                },
-                "Photo": {
-                  "type": "object",
-                  "properties": {
-                    "url": {
-                      "type": "string"
-                    },
-                    "labels": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "SearchResponse": {
-                  "type": "object",
-                  "properties": {
-                    "results": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Photo"
-                      }
-                    }
-                  }
-                }
-              }
             }
-          }
-      },
-      "CDDemoLambdagetAZsAPIPermissionProd": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "Principal": "apigateway.amazonaws.com",
-          "FunctionName": {
-            "Ref": "searchphotos"
-          },
-          "SourceArn": {
-            "Fn::Sub": [
-              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/search",
-              {
-                "__Stage__": "*",
-                "__ApiId__": {
-                  "Ref": "ServerlessRestApi"
-                }
-              }
-            ]
-          }
-        }
-      },
-      "CDDemoLambdagetAZsAPIPermissionProd": {
-        "Type": "AWS::Lambda::Permission",
-        "Properties": {
-          "Action": "lambda:InvokeFunction",
-          "Principal": "apigateway.amazonaws.com",
-          "FunctionName": {
-            "Ref": "indexphotos"
-          },
-          "SourceArn": {
-            "Fn::Sub": [
-              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/PUT/upload",
-              {
-                "__Stage__": "*",
-                "__ApiId__": {
-                  "Ref": "ServerlessRestApi"
-                }
-              }
-            ]
-          }
-        }
-      },
-      "ServerlessRestApiProdStage": {
-        "Type": "AWS::ApiGateway::Stage",
-        "Properties": {
-          "DeploymentId": {
-            "Ref": "ServerlessRestApiDeploymentr8jr30hj6i"
-          },
-          "RestApiId": {
-            "Ref": "ServerlessRestApi"
-          },
-          "StageName": "Prod"
-        }
-      }
-    },
-    "pipeline": {
-        "name": "P1",
-        "roleArn": "arn:aws:iam::492808346955:role/service-role/AWSCodePipelineServiceRole-us-east-1-P1",
-        "artifactStore": {
-            "type": "S3",
-            "location": "codepipeline-us-east-1-509756505110"
         },
-        "stages": [
-            {
-                "name": "Source",
-                "actions": [
-                    {
-                        "name": "Source",
-                        "actionTypeId": {
-                            "category": "Source",
-                            "owner": "AWS",
-                            "provider": "CodeStarSourceConnection",
-                            "version": "1"
-                        },
-                        "runOrder": 1,
-                        "configuration": {
-                            "BranchName": "master",
-                            "ConnectionArn": "arn:aws:codestar-connections:us-east-2:492808346955:connection/0f57b675-4212-4b8a-93d1-15b95d96edda",
-                            "FullRepositoryId": "ravishrawal/SmartPhotoSearch",
-                            "OutputArtifactFormat": "CODE_ZIP"
-                        },
-                        "outputArtifacts": [
-                            {
-                                "name": "SourceArtifact"
+        "searchphotosApi1PermissionProd": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "FunctionName": {
+                    "Ref": "searchphotos"
+                },
+                "SourceArn": {
+                    "Fn::Sub": [
+                        "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/search",
+                        {
+                            "__Stage__": "*",
+                            "__ApiId__": {
+                                "Ref": "ServerlessRestApi"
                             }
-                        ],
-                        "inputArtifacts": [],
-                        "region": "us-east-1"
-                    }
-                ]
+                        }
+                    ]
+                }
             },
-            {
-                "name": "Build",
-                "actions": [
-                    {
-                        "name": "Build",
-                        "actionTypeId": {
-                            "category": "Build",
-                            "owner": "AWS",
-                            "provider": "CodeBuild",
-                            "version": "1"
-                        },
-                        "runOrder": 1,
-                        "configuration": {
-                            "ProjectName": "SmartPhotoSearch"
-                        },
-                        "outputArtifacts": [
-                            {
-                                "name": "BuildArtifact"
-                            }
-                        ],
-                        "inputArtifacts": [
-                            {
-                                "name": "SourceArtifact"
-                            }
-                        ],
-                        "region": "us-east-1"
-                    }
-                ]
-            },
-            {
-                "name": "Deploy",
-                "actions": [
-                    {
-                        "name": "Deploy",
-                        "actionTypeId": {
-                            "category": "Deploy",
-                            "owner": "AWS",
-                            "provider": "CloudFormation",
-                            "version": "1"
-                        },
-                        "runOrder": 1,
-                        "configuration": {
-                            "ActionMode": "CREATE_UPDATE",
-                            "Capabilities": "CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND",
-                            "OutputFileName": "output_deploy",
-                            "RoleArn": "arn:aws:iam::492808346955:role/CloudFormationRole",
-                            "StackName": "SmartPhotoAlbumStack",
-                            "TemplatePath": "BuildArtifact::outputsamtemplate.yml"
-                        },
-                        "outputArtifacts": [],
-                        "inputArtifacts": [
-                            {
-                                "name": "BuildArtifact"
-                            }
-                        ],
-                        "region": "us-east-1"
-                    }
-                ]
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "a9a79634-8093-4e48-8dff-19eac771cc85"
+                }
             }
-        ],
-        "version": 1
-    },
-    // "metadata": {
-    //     "pipelineArn": "arn:aws:codepipeline:us-east-1:492808346955:P1",
-    //     "created": 1607892232.786,
-    //     "updated": 1607892232.786
-    // }
-    "pipeline": {
-        "name": "P2",
-        "roleArn": "arn:aws:iam::492808346955:role/service-role/AWSCodePipelineServiceRole-us-east-1-P2",
-        "artifactStore": {
-            "type": "S3",
-            "location": "codepipeline-us-east-1-509756505110"
         },
-        "stages": [
-            {
-                "name": "Source",
-                "actions": [
+        "indexphotos": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Layers": [
+                    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:14",
+                    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:11",
+                    "arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1"
+                ],
+                "Code": {
+                    "S3Bucket": "lambdas-smartphotosearch",
+                    "S3Key": "3c1beb88a760927707838c0751a36bc8"
+                },
+                "Description": "",
+                "Tags": [
                     {
-                        "name": "Source",
-                        "actionTypeId": {
-                            "category": "Source",
-                            "owner": "AWS",
-                            "provider": "CodeStarSourceConnection",
-                            "version": "1"
-                        },
-                        "runOrder": 1,
-                        "configuration": {
-                            "BranchName": "master",
-                            "ConnectionArn": "arn:aws:codestar-connections:us-east-2:492808346955:connection/0f57b675-4212-4b8a-93d1-15b95d96edda",
-                            "FullRepositoryId": "ravishrawal/SmartPhotoSearch",
-                            "OutputArtifactFormat": "CODE_ZIP"
-                        },
-                        "outputArtifacts": [
-                            {
-                                "name": "SourceArtifact"
-                            }
-                        ],
-                        "inputArtifacts": [],
-                        "region": "us-east-1"
+                        "Value": "SAM",
+                        "Key": "lambda:createdBy"
                     }
-                ]
+                ],
+                "MemorySize": 128,
+                "Environment": {
+                    "Variables": {
+                        "REGION": "us-east-1"
+                    }
+                },
+                "Handler": "lambda_function.lambda_handler",
+                "Role": "arn:aws:iam::492808346955:role/service-role/index-photos-role-ork70yys",
+                "Timeout": 7,
+                "Runtime": "python3.8"
             },
-            {
-                "name": "Deploy",
-                "actions": [
-                    {
-                        "name": "Deploy",
-                        "actionTypeId": {
-                            "category": "Deploy",
-                            "owner": "AWS",
-                            "provider": "S3",
-                            "version": "1"
-                        },
-                        "runOrder": 1,
-                        "configuration": {
-                            "BucketName": "photo-album-hosting",
-                            "Extract": "true"
-                        },
-                        "outputArtifacts": [],
-                        "inputArtifacts": [
-                            {
-                                "name": "SourceArtifact"
-                            }
-                        ],
-                        "region": "us-east-1"
-                    }
-                ]
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "d569f044-3b67-4efe-9970-79377e48d144"
+                }
             }
-        ],
-        "version": 1
+        },
+        "ServerlessRestApiProdStage": {
+            "Type": "AWS::ApiGateway::Stage",
+            "Properties": {
+                "DeploymentId": {
+                    "Ref": "ServerlessRestApiDeployment20b4e0eea9"
+                },
+                "RestApiId": {
+                    "Ref": "ServerlessRestApi"
+                },
+                "StageName": "Prod"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "99e371e6-5d08-4591-a2f2-8e400b4de504"
+                }
+            }
+        },
+        "ServerlessRestApiDeployment20b4e0eea9": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "ServerlessRestApi"
+                },
+                "Description": "RestApi deployment id: 20b4e0eea9b8794365fce6d2281ccc00fded8912",
+                "StageName": "Stage"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "a6028cf6-6f64-4a85-8285-15bd09228897"
+                }
+            }
+        },
+        "indexphotosBucketEvent1Permission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:InvokeFunction",
+                "SourceAccount": {
+                    "Ref": "AWS::AccountId"
+                },
+                "FunctionName": {
+                    "Ref": "indexphotos"
+                },
+                "Principal": "s3.amazonaws.com"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "fa43d656-1954-4014-95de-528aec6f335e"
+                }
+            }
+        },
+        "ServerlessRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Description": "API to upload & get images",
+                "Body": {
+                    "openapi": "3.0.1",
+                    "info": {
+                        "version": "1.0",
+                        "title": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    "servers": [
+                        {
+                            "url": "https://r8jr30hj6i.execute-api.us-east-1.amazonaws.com/{basePath}",
+                            "variables": {
+                                "basePath": {
+                                    "default": "/Prod"
+                                }
+                            }
+                        }
+                    ],
+                    "paths": {
+                        "/upload": {
+                            "put": {
+                                "operationId": "uploadPhoto",
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "POST",
+                                    "credentials" : "arn:aws:iam::492808346955:role/AWSInvokeLambda",
+                                    "type": "aws_proxy",
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${indexphotos.Arn}/invocations"
+                                    }
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/MODELcff9be"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "400 response",
+                                        "content": {}
+                                    },
+                                    "403": {
+                                        "description": "403 response",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/Error"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "500": {
+                                        "description": "500 response",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/Error"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "options": {
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "OPTIONS",
+                                    "type": "mock"
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "content": {}
+                                    },
+                                    "400": {
+                                        "description": "400 response",
+                                        "content": {}
+                                    },
+                                    "403": {
+                                        "description": "403 response",
+                                        "content": {}
+                                    },
+                                    "404": {
+                                        "description": "404 response",
+                                        "content": {}
+                                    },
+                                    "500": {
+                                        "description": "500 response",
+                                        "content": {}
+                                    }
+                                }
+                            }
+                        },
+                        "/search": {
+                            "get": {
+                                "operationId": "searchPhotos",
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "POST",
+                                    "credentials" : "arn:aws:iam::492808346955:role/AWSInvokeLambda",
+                                    "type": "aws_proxy",
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${searchphotos.Arn}/invocations"
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "q",
+                                        "in": "query",
+                                        "schema": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/SearchResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "403": {
+                                        "description": "403 response",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/Error"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "500": {
+                                        "description": "500 response",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/Error"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "options": {
+                                "x-amazon-apigateway-integration": {
+                                    "httpMethod": "OPTIONS",
+                                    "type": "mock"
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "schema": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "content": {}
+                                    },
+                                    "400": {
+                                        "description": "400 response",
+                                        "content": {}
+                                    },
+                                    "403": {
+                                        "description": "403 response",
+                                        "content": {}
+                                    },
+                                    "500": {
+                                        "description": "500 response",
+                                        "content": {}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "components": {
+                        "schemas": {
+                            "Error": {
+                                "type": "object",
+                                "properties": {
+                                    "code": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    },
+                                    "message": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "MODELcff9be": {
+                                "type": "object",
+                                "properties": {}
+                            },
+                            "Photo": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string"
+                                    },
+                                    "labels": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "SearchResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "results": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Photo"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "b67e7c61-f383-4031-a2c1-26426d5b5925"
+                }
+            }
+        },
+        "searchphotos": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Layers": [
+                    "arn:aws:lambda:us-east-1:492808346955:layer:aws4auth2:1",
+                    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-elasticsearch:15",
+                    "arn:aws:lambda:us-east-1:770693421928:layer:Klayers-python38-requests:12"
+                ],
+                "Code": {
+                    "S3Bucket": "lambdas-smartphotosearch",
+                    "S3Key": "c8f15c05f2c617508a9a54c8a3dd1d65"
+                },
+                "Description": "",
+                "Tags": [
+                    {
+                        "Value": "SAM",
+                        "Key": "lambda:createdBy"
+                    }
+                ],
+                "MemorySize": 128,
+                "Environment": {
+                    "Variables": {
+                        "REGION": "us-east-1"
+                    }
+                },
+                "Handler": "lambda_function.lambda_handler",
+                "Role": "arn:aws:iam::492808346955:role/service-role/search-photos-role-pt64js09",
+                "Timeout": 7,
+                "Runtime": "python3.8"
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Designer": {
+                    "id": "a972acbb-4696-4a6d-8e01-0a6f67b77768"
+                }
+            }
+        },
+    "Pipeline1": {
+        "Type": "AWS::CodePipeline::Pipeline",
+        "Properties": {
+            "Name": "P1RavTest",
+            "RoleArn": "arn:aws:iam::492808346955:role/service-role/AWSCodePipelineServiceRole-us-east-1-P1",
+            "ArtifactStore": {
+                "Type": "S3",
+                "Location": "codepipeline-us-east-1-509756505110"
+            },
+            "Stages": [
+                {
+                    "Name": "Source",
+                    "Actions": [
+                        {
+                            "Name": "Source",
+                            "ActionTypeId": {
+                                "Category": "Source",
+                                "Owner": "AWS",
+                                "Provider": "CodeStarSourceConnection",
+                                "Version": "1"
+                            },
+                            "RunOrder": 1,
+                            "Configuration": {
+                                "BranchName": "master",
+                                "ConnectionArn": "arn:aws:codestar-connections:us-east-2:492808346955:connection/0f57b675-4212-4b8a-93d1-15b95d96edda",
+                                "FullRepositoryId": "ravishrawal/SmartPhotoSearch",
+                                "OutputArtifactFormat": "CODE_ZIP"
+                            },
+                            "OutputArtifacts": [
+                                {
+                                    "Name": "SourceArtifact"
+                                }
+                            ],
+                            "InputArtifacts": [],
+                            "Region": "us-east-1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Build",
+                    "Actions": [
+                        {
+                            "Name": "Build",
+                            "ActionTypeId": {
+                                "Category": "Build",
+                                "Owner": "AWS",
+                                "Provider": "CodeBuild",
+                                "Version": "1"
+                            },
+                            "RunOrder": 1,
+                            "Configuration": {
+                                "ProjectName": "RavTestPhotoSearch"
+                            },
+                            "OutputArtifacts": [
+                                {
+                                    "Name": "BuildArtifact"
+                                }
+                            ],
+                            "InputArtifacts": [
+                                {
+                                    "Name": "SourceArtifact"
+                                }
+                            ],
+                            "Region": "us-east-1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Deploy",
+                    "Actions": [
+                        {
+                            "Name": "Deploy",
+                            "ActionTypeId": {
+                                "Category": "Deploy",
+                                "Owner": "AWS",
+                                "Provider": "CloudFormation",
+                                "Version": "1"
+                            },
+                            "RunOrder": 1,
+                            "Configuration": {
+                                "ActionMode": "CREATE_UPDATE",
+                                "Capabilities": "CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND",
+                                "OutputFileName": "output_deploy",
+                                "RoleArn": "arn:aws:iam::492808346955:role/CloudFormationRole",
+                                "StackName": "SmartPhotoAlbumStack",
+                                "TemplatePath": "BuildArtifact::outputsamtemplate.yml"
+                            },
+                            "OutputArtifacts": [],
+                            "InputArtifacts": [
+                                {
+                                    "Name": "BuildArtifact"
+                                }
+                            ],
+                            "Region": "us-east-1"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "Pipeline2": {
+        "Type": "AWS::CodePipeline::Pipeline",
+        "Properties": {
+            "Name": "P2RavTest",
+            "RoleArn": "arn:aws:iam::492808346955:role/service-role/AWSCodePipelineServiceRole-us-east-1-P2",
+            "ArtifactStore": {
+                "Type": "S3",
+                "Location": "codepipeline-us-east-1-509756505110"
+            },
+            "Stages": [
+                {
+                    "Name": "Source",
+                    "Actions": [
+                        {
+                            "Name": "Source",
+                            "ActionTypeId": {
+                                "Category": "Source",
+                                "Owner": "AWS",
+                                "Provider": "CodeStarSourceConnection",
+                                "Version": "1"
+                            },
+                            "RunOrder": 1,
+                            "Configuration": {
+                                "BranchName": "master",
+                                "ConnectionArn": "arn:aws:codestar-connections:us-east-2:492808346955:connection/0f57b675-4212-4b8a-93d1-15b95d96edda",
+                                "FullRepositoryId": "ravishrawal/SmartPhotoSearch",
+                                "OutputArtifactFormat": "CODE_ZIP"
+                            },
+                            "OutputArtifacts": [
+                                {
+                                    "Name": "SourceArtifact"
+                                }
+                            ],
+                            "InputArtifacts": [],
+                            "Region": "us-east-1"
+                        }
+                    ]
+                },
+                {
+                    "Name": "Deploy",
+                    "Actions": [
+                        {
+                            "Name": "Deploy",
+                            "ActionTypeId": {
+                                "Category": "Deploy",
+                                "Owner": "AWS",
+                                "Provider": "S3",
+                                "Version": "1"
+                            },
+                            "RunOrder": 1,
+                            "Configuration": {
+                                "BucketName": "photo-album-hosting",
+                                "Extract": "true"
+                            },
+                            "OutputArtifacts": [],
+                            "InputArtifacts": [
+                                {
+                                    "Name": "SourceArtifact"
+                                }
+                            ],
+                            "Region": "us-east-1"
+                        }
+                    ]
+                }
+            ]
+        }
     },
     "RootRole": {
             "Type": "AWS::IAM::Role",
@@ -728,66 +785,135 @@
               "Path": "/",
               "MaxSessionDuration": 3600
             }
-        },
-        "AwsServiceRoleForAmazonElasticsearchService": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Service": "es.amazonaws.com"
-                    },
-                    "Action": "sts:AssumeRole"
-                  }
+        }
+    },
+    "Metadata": {
+        "AWS::CloudFormation::Designer": {
+            "a972acbb-4696-4a6d-8e01-0a6f67b77768": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 60,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "b67e7c61-f383-4031-a2c1-26426d5b5925": {
+                "size": {
+                    "width": 330,
+                    "height": 240
+                },
+                "position": {
+                    "x": 60,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": [
+                    "a6028cf6-6f64-4a85-8285-15bd09228897",
+                    "99e371e6-5d08-4591-a2f2-8e400b4de504"
                 ]
-              },
-              "Path": "/aws-service-role/es.amazonaws.com/",
-              "MaxSessionDuration": 3600
-            }
-        },
-        "AwsServiceRoleForLexBots": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Service": "lex.amazonaws.com"
-                    },
-                    "Action": "sts:AssumeRole"
-                  }
+            },
+            "a6028cf6-6f64-4a85-8285-15bd09228897": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 90,
+                    "y": 150
+                },
+                "z": 2,
+                "parent": "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                "embeds": [],
+                "iscontainedinside": [
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925"
                 ]
-              },
-              "Path": "/aws-service-role/lex.amazonaws.com/",
-              "MaxSessionDuration": 3600
-            }
-        },
-        "AwsServiceRoleForTrustedAdvisor": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "Description": "Access for the AWS Trusted Advisor Service to help reduce cost, increase performance, and improve security of your AWS environment.",
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Service": "trustedadvisor.amazonaws.com"
-                    },
-                    "Action": "sts:AssumeRole"
-                  }
+            },
+            "99e371e6-5d08-4591-a2f2-8e400b4de504": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 210,
+                    "y": 150
+                },
+                "z": 2,
+                "parent": "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                "embeds": [],
+                "isassociatedwith": [
+                    "a6028cf6-6f64-4a85-8285-15bd09228897"
+                ],
+                "iscontainedinside": [
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925",
+                    "b67e7c61-f383-4031-a2c1-26426d5b5925"
                 ]
-              },
-              "Path": "/aws-service-role/trustedadvisor.amazonaws.com/",
-              "MaxSessionDuration": 3600
+            },
+            "d569f044-3b67-4efe-9970-79377e48d144": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 180,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": []
+            },
+            "fa43d656-1954-4014-95de-528aec6f335e": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 300,
+                    "y": 390
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "d569f044-3b67-4efe-9970-79377e48d144"
+                ]
+            },
+            "a9a79634-8093-4e48-8dff-19eac771cc85": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 450,
+                    "y": 90
+                },
+                "z": 1,
+                "embeds": [],
+                "isassociatedwith": [
+                    "a972acbb-4696-4a6d-8e01-0a6f67b77768"
+                ]
+            },
+            "efe27200-2ca1-47ca-a53a-f0f45d3738db": {
+                "size": {
+                    "width": 60,
+                    "height": 60
+                },
+                "position": {
+                    "x": 450,
+                    "y": 210
+                },
+                "z": 1,
+                "embeds": [],
+                "dependson": [
+                    "fa43d656-1954-4014-95de-528aec6f335e"
+                ]
             }
         }
-
-  }
-
+    }
 }
