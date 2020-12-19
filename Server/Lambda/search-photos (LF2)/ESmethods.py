@@ -10,7 +10,7 @@ from requests_aws4auth import AWS4Auth
 
 class MyES():
     def __init__(self):
-        self.host = "search-photos-raxeemcbzh2cvhzjevl2p6oaka.us-east-1.es.amazonaws.com"
+        self.host = "search-search-photos-g7nnykm7uwwvtnkbzv5coxsxua.us-east-1.es.amazonaws.com"
         self.region = 'us-east-1' # e.g. us-west-1
         self.service = 'es'
         self.credentials = boto3.Session().get_credentials()
