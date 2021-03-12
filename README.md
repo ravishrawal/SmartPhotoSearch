@@ -29,10 +29,7 @@ Image classification enabled by AWS Rekognition
 - AWS CodeBuild
 
 - AWS CloudFormation
-
-
-
-
-
+\
+\
 
 *In collaboration with Viren Bajaj*
