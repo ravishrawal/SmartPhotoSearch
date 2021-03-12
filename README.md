@@ -7,18 +7,18 @@ Image classification enabled by AWS Rekognition
 ### Stack:
 
 ##### Server:
--- AWS DynamoDB
+- AWS DynamoDB
 
--- AWS S3
+- AWS S3
 
--- AWS Lambda
+- AWS Lambda
 
--- AWS API Gateway
+- AWS API Gateway
 
 ##### Client:
--- React 
+- React 
 
--- Webkit (speech to text)
+- Webkit (speech to text)
 
--- HTML/CSS
+- HTML/CSS
 
