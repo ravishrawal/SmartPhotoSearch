@@ -22,3 +22,11 @@ Image classification enabled by AWS Rekognition
 
 - HTML/CSS
 
+
+##### DevOps:
+- AWS CodePipeline
+
+- AWS CodeBuild
+
+- AWS CloudFormation
+
