@@ -28,7 +28,7 @@ Image classification enabled by AWS Rekognition
 
 - AWS CodeBuild
 
-- AWS CloudFormation \
+- AWS CloudFormation\
 
  \
 
