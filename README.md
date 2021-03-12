@@ -32,4 +32,7 @@ Image classification enabled by AWS Rekognition
 
 
 
+
+
+
 *In collaboration with Viren Bajaj*
