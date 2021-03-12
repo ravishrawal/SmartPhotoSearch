@@ -28,8 +28,8 @@ Image classification enabled by AWS Rekognition
 
 - AWS CodeBuild
 
-- AWS CloudFormation\s
+- AWS CloudFormation\s\s
 
-\s
+\s\s
 
 *In collaboration with Viren Bajaj*
