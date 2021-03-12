@@ -8,12 +8,17 @@ Image classification enabled by AWS Rekognition
 
 ##### Server:
 -- AWS DynamoDB
+
 -- AWS S3
+
 -- AWS Lambda
+
 -- AWS API Gateway
 
 ##### Client:
 -- React 
+
 -- Webkit (speech to text)
+
 -- HTML/CSS
 
