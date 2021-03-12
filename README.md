@@ -30,8 +30,8 @@ Image classification enabled by AWS Rekognition
 
 - AWS CloudFormation
 
-\
+ \
 
-\
+ \
 
 *In collaboration with Viren Bajaj*
